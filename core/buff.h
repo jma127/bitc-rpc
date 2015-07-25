@@ -28,12 +28,13 @@ buff_resize(struct buff *buf,
 {
    size_t newlen;
 
+   if (sz <= buf->len) {
+       return;
+   }
+
    ASSERT(buf->grow);
 
-   /*
-    * Grow by at least sz bytes.
-    */
-   newlen = MAX(buf->len * 2, buf->len + sz);
+   newlen = MAX(buf->len * 2, sz);
 
    buf->base = safe_realloc(buf->base, newlen);
    buf->len = newlen;
@@ -53,22 +54,6 @@ buff_curptr(const struct buff *buf)
 {
    ASSERT(buf->idx < buf->len);
    return buf->base + buf->idx;
-}
-
-
-/*
- *------------------------------------------------------------------------
- *
- * buff_check_overflow --
- *
- *------------------------------------------------------------------------
- */
-
-static inline int
-buff_check_overflow(const struct buff *buf,
-                    size_t sz)
-{
-   return buf->idx + sz > buf->len;
 }
 
 
@@ -157,12 +142,7 @@ buff_skip(struct buff *buf,
 {
    ASSERT(buf);
 
-   if (buff_check_overflow(buf, len)) {
-      if (!buf->grow) {
-         return 1;
-      }
-      buff_resize(buf, len);
-   }
+   buff_resize(buf, buf->idx + len);
    buf->idx += len;
 
    return 0;
@@ -223,12 +203,7 @@ buff_copy_to(struct buff *dst,
              const void *src,
              size_t len)
 {
-   if (buff_check_overflow(dst, len)) {
-      if (!dst->grow) {
-         return 1;
-      }
-      buff_resize(dst, len);
-   }
+   buff_resize(dst, dst->idx + len);
    if (len > 0) {
       memcpy(buff_curptr(dst), src, len);
       dst->idx += len;
@@ -250,12 +225,7 @@ buff_copy_from(struct buff *src,
                void *dst,
                size_t len)
 {
-   if (buff_check_overflow(src, len)) {
-      if (src->grow) {
-         return 1;
-      }
-      buff_resize(src, len);
-   }
+   buff_resize(src, src->idx + len);
    memcpy(dst, buff_curptr(src), len);
    src->idx += len;
    return 0;
@@ -278,6 +248,43 @@ buff_append(struct buff *dst,
       return 0;
    }
    return buff_copy_to(dst, src->base, src->idx);
+}
+
+
+/*
+ *------------------------------------------------------------------------
+ *
+ * buff_append --
+ *
+ *------------------------------------------------------------------------
+ */
+
+static inline int
+buff_append_str(struct buff *dst,
+                const char *src)
+{
+   if (src == NULL) {
+      return 0;
+   }
+   return buff_copy_to(dst, src, strlen(src));
+}
+
+
+/*
+ *------------------------------------------------------------------------
+ *
+ * buff_push_back --
+ *
+ *------------------------------------------------------------------------
+ */
+
+static inline int
+buff_push_back(struct buff *dst,
+               uint8 i)
+{
+   buff_resize(dst, dst->idx + 1);
+   dst->base[dst->idx++] = i;
+   return 0;
 }
 
 

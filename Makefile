@@ -13,7 +13,7 @@ ASAN = 0
 ### CFLAGS
 ###
 
-CFLAGS  = -O1 -MMD -g
+CFLAGS += -O1 -MMD -g
 CFLAGS += -Wall -Werror
 ifneq ($(ARCH), armv6l)
 CFLAGS += -Wshadow -Wextra
@@ -57,7 +57,7 @@ endif
 ###
 
 LIBS  = -lpthread -lssl -lcrypto -lm -lncurses -lpanel -lform -lcurl
-LIBS += -lleveldb -lsnappy -lstdc++
+LIBS += -lleveldb -lsnappy -lstdc++ -lhttp_parser -ljansson
 
 ifeq ($(OS), OpenBSD)
 LIBS += -L/usr/local/lib -lexecinfo
@@ -89,6 +89,7 @@ BTC_FILES += core/wallet.c
 BTC_FILES += core/serialize.c
 BTC_FILES += core/crypt.c
 BTC_FILES += core/rpc.c
+BTC_FILES += core/rpc_methods.c
 BTC_FILES += core/hash.c
 
 BTC_FILES += lib/hashtable/hashtable.c

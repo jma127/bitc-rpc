@@ -1,6 +1,8 @@
 #ifndef __BTC_H__
 #define __BTC_H__
 
+#include "basic_defs.h"
+
 
 enum bitc_state {
    BITC_STATE_STARTING,

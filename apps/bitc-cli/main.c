@@ -39,6 +39,7 @@
 #include "ip_info.h"
 #include "crypt.h"
 #include "rpc.h"
+#include "rpc_methods.h"
 #include "bitc_ui.h"
 
 
@@ -1085,6 +1086,11 @@ bitc_init(struct secure_area *passphrase,
    bitcui_set_status("adding peers..");
    peergroup_seed();
 
+   res = rpc_methods_init();
+   if (res != 0) {
+       return res;
+   }
+
    return rpc_init();
 }
 
@@ -1102,6 +1108,7 @@ bitc_exit(void)
 {
    Log(LGPFX" %s\n", __FUNCTION__);
    rpc_exit();
+   rpc_methods_exit();
    peergroup_exit(btc->peerGroup);
    btc->peerGroup = NULL;
    addrbook_close(btc->book);

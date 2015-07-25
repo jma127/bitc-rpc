@@ -1,3 +1,13 @@
+### Fork notes
+
+This is a fork of the bitc SPV CLI client. I was looking for a SPV
+implementation of the JSON-RPC API and couldn't find any. This fork is my
+attempt to build an RPC-enabled client that doesn't require multi-GB downloads
+and storage space.
+
+I'm going to hold off on reconciliating style until the most crucial RPC methods
+are implemented.
+
 ### BITC
 
 bitc is a *thin* SPV bitcoin client.
