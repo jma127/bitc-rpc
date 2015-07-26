@@ -227,6 +227,8 @@ exit:
 
     netasync_send(socket, buff_base(resp_str), buff_curlen(resp_str),
                   rpc_send_cb, resp_str);
+    free(resp_str);  // free the container without freeing the underlying byte
+                     // buffer, which is freed by netasync_send().
 }
 
 
