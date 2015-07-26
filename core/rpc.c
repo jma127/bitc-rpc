@@ -17,8 +17,8 @@
 #include "hashtable.h"
 
 #define LGPFX "RPC:"
-#define RPC_RECV_HEADER_BLOCK_SIZE (4)
-#define RPC_RECV_BLOCK_SIZE (50)
+#define RPC_RECV_HEADER_BLOCK_SIZE (1)  // hack
+#define RPC_RECV_BLOCK_SIZE (1024)
 
 
 struct rpc_client_data {
@@ -26,6 +26,7 @@ struct rpc_client_data {
     http_parser *parser;
     http_parser_settings *parser_settings;
     int64_t offset;
+    bool headers_complete;
 };
 
 
@@ -43,7 +44,9 @@ static const char *auth_str;  // i would mlock this, but since it's already
  */
 
 static int
-http_body_handler(http_parser *parser, const char *at, size_t length) {
+http_body_handler(http_parser *parser,
+                  const char *at,
+                  size_t length) {
     struct rpc_client_data *data;
 
     data = (struct rpc_client_data *) parser->data;
@@ -53,6 +56,21 @@ http_body_handler(http_parser *parser, const char *at, size_t length) {
             return 1;
         }
     }
+    return 0;
+}
+
+
+/*
+ *-------------------------------------------------------------------------
+ *
+ * -- http_on_headers_complete_handler
+ *
+ *-------------------------------------------------------------------------
+ */
+
+static int
+http_on_headers_complete_handler(http_parser *parser) {
+    ((struct rpc_client_data *) parser->data)->headers_complete = 1;
     return 0;
 }
 
@@ -78,7 +96,10 @@ rpc_client_data_alloc(void)
     data->parser_settings = safe_malloc(sizeof *data->parser_settings);
     http_parser_settings_init(data->parser_settings);
     data->parser_settings->on_body = http_body_handler;
+    data->parser_settings->on_headers_complete
+      = http_on_headers_complete_handler;
     data->offset = -1;
+    data->headers_complete = 0;
 
     return data;
 }
@@ -384,12 +405,14 @@ rpc_receive_cb(struct netasync_socket *socket,
       = data->offset < 0
         ? RPC_RECV_HEADER_BLOCK_SIZE
         : MIN(RPC_RECV_BLOCK_SIZE, data->parser->content_length);
-    if (next_read_size > 0) {  // Continue reading
+    if ((data->headers_complete &&
+         data->parser->content_length == ((uint64_t) -1)) ||
+        next_read_size <= 0) {
+        rpc_process_request(socket, data);
+    } else {
         buff_resize(data->buf, buff_curlen(data->buf) + next_read_size);
         netasync_receive(socket, buff_curptr(data->buf), next_read_size, 0,
                          rpc_receive_cb, data);
-    } else {  // rpc_process_request
-        rpc_process_request(socket, data);
     }
 }
 
