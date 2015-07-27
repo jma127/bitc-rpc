@@ -5,7 +5,6 @@
 
 struct buff;
 
-
 int deserialize_bytes(struct buff *buf, void *val, size_t len);
 int deserialize_uint8(struct buff *buf, uint8 *val);
 int deserialize_uint16(struct buff *buf, uint16 *val);
@@ -38,6 +37,5 @@ int serialize_version(struct buff *buf, const btc_msg_version *v);
 int serialize_msgheader(struct buff *buf, const btc_msg_header *h);
 int serialize_blocklocator(struct buff *buf, const btc_block_locator *bl);
 int serialize_tx(struct buff *buf, const btc_msg_tx *tx);
-
 
 #endif /* __SERIALIZE_H__ */

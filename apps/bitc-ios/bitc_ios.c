@@ -15,7 +15,6 @@
 #include "bitc.h"
 #include "block-store.h"
 
-
 /*
  *-------------------------------------------------------------------
  *
@@ -24,13 +23,9 @@
  *-------------------------------------------------------------------
  */
 
-void
-bitc_ios_log(const char *pfx,
-             const char *line)
-{
-   LogViewAppend(pfx, line);
+void bitc_ios_log(const char *pfx, const char *line) {
+  LogViewAppend(pfx, line);
 }
-
 
 /*
  *-------------------------------------------------------------------
@@ -40,40 +35,34 @@ bitc_ios_log(const char *pfx,
  *-------------------------------------------------------------------
  */
 
-void
-bitc_ios_dashboard_update(void)
-{
-   btc_block_header hdr;
-   char hashStr[80];
-   char *ts = NULL;
-   uint256 hash;
-   int height;
-   bool s;
+void bitc_ios_dashboard_update(void) {
+  btc_block_header hdr;
+  char hashStr[80];
+  char *ts = NULL;
+  uint256 hash;
+  int height;
+  bool s;
 
-   if (btc->blockStore == NULL) {
-      return;
-   }
+  if (btc->blockStore == NULL) {
+    return;
+  }
 
-   height = blockstore_get_height(btc->blockStore);
-   if (height == 0) {
-      return;
-   }
+  height = blockstore_get_height(btc->blockStore);
+  if (height == 0) {
+    return;
+  }
 
-   s = blockstore_get_block_at_height(btc->blockStore, height, &hash, &hdr);
+  s = blockstore_get_block_at_height(btc->blockStore, height, &hash, &hdr);
 
-   ASSERT(mutex_islocked(btcui->lock));
+  ASSERT(mutex_islocked(btcui->lock));
 
-   uint256_snprintf_reverse(hashStr, sizeof hashStr, &hash);
-   ts = print_time_local(hdr.timestamp, "%c");
+  uint256_snprintf_reverse(hashStr, sizeof hashStr, &hash);
+  ts = print_time_local(hdr.timestamp, "%c");
 
-   DashboardUpdate(height, hashStr,
-                   btcui->num_peers_active,
-                   btcui->num_peers_alive,
-                   btcui->num_addrs,
-                   ts ? ts : "");
-   free(ts);
+  DashboardUpdate(height, hashStr, btcui->num_peers_active,
+                  btcui->num_peers_alive, btcui->num_addrs, ts ? ts : "");
+  free(ts);
 }
-
 
 /*
  *-------------------------------------------------------------------
@@ -83,17 +72,14 @@ bitc_ios_dashboard_update(void)
  *-------------------------------------------------------------------
  */
 
-void
-bitc_ios_blocklist_update(void)
-{
-   int height;
+void bitc_ios_blocklist_update(void) {
+  int height;
 
-   ASSERT(mutex_islocked(btcui->lock));
+  ASSERT(mutex_islocked(btcui->lock));
 
-   height = blockstore_get_height(btc->blockStore);
-   BlockListAddBlock(height);
+  height = blockstore_get_height(btc->blockStore);
+  BlockListAddBlock(height);
 }
-
 
 /*
  *-------------------------------------------------------------------
@@ -103,13 +89,11 @@ bitc_ios_blocklist_update(void)
  *-------------------------------------------------------------------
  */
 
-void
-bitc_ios_info_update(void)
-{
-   mutex_lock(btcui->lock);
+void bitc_ios_info_update(void) {
+  mutex_lock(btcui->lock);
 
-   bitc_ios_dashboard_update();
-   bitc_ios_blocklist_update();
+  bitc_ios_dashboard_update();
+  bitc_ios_blocklist_update();
 
-   mutex_unlock(btcui->lock);
+  mutex_unlock(btcui->lock);
 }

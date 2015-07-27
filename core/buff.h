@@ -7,12 +7,11 @@
 #include "util.h"
 
 struct buff {
-   uint8     *base;
-   size_t     len;
-   ssize_t    idx;
-   bool       grow;
+  uint8 *base;
+  size_t len;
+  ssize_t idx;
+  bool grow;
 };
-
 
 /*
  *------------------------------------------------------------------------
@@ -22,24 +21,20 @@ struct buff {
  *------------------------------------------------------------------------
  */
 
-static inline void
-buff_resize(struct buff *buf,
-            size_t sz)
-{
-   size_t newlen;
+static inline void buff_resize(struct buff *buf, size_t sz) {
+  size_t newlen;
 
-   if (sz <= buf->len) {
-       return;
-   }
+  if (sz <= buf->len) {
+    return;
+  }
 
-   ASSERT(buf->grow);
+  ASSERT(buf->grow);
 
-   newlen = MAX(buf->len * 2, sz);
+  newlen = MAX(buf->len * 2, sz);
 
-   buf->base = safe_realloc(buf->base, newlen);
-   buf->len = newlen;
+  buf->base = safe_realloc(buf->base, newlen);
+  buf->len = newlen;
 }
-
 
 /*
  *------------------------------------------------------------------------
@@ -49,13 +44,10 @@ buff_resize(struct buff *buf,
  *------------------------------------------------------------------------
  */
 
-static inline uint8 *
-buff_curptr(const struct buff *buf)
-{
-   ASSERT(buf->idx < buf->len);
-   return buf->base + buf->idx;
+static inline uint8 *buff_curptr(const struct buff *buf) {
+  ASSERT(buf->idx < buf->len);
+  return buf->base + buf->idx;
 }
-
 
 /*
  *------------------------------------------------------------------------
@@ -65,15 +57,12 @@ buff_curptr(const struct buff *buf)
  *------------------------------------------------------------------------
  */
 
-static inline void *
-buff_base(const struct buff *buf)
-{
-   if (buf == NULL) {
-      return NULL;
-   }
-   return buf->base;
+static inline void *buff_base(const struct buff *buf) {
+  if (buf == NULL) {
+    return NULL;
+  }
+  return buf->base;
 }
-
 
 /*
  *------------------------------------------------------------------------
@@ -83,15 +72,12 @@ buff_base(const struct buff *buf)
  *------------------------------------------------------------------------
  */
 
-static inline size_t
-buff_maxlen(const struct buff *buf)
-{
-   if (buf == NULL) {
-      return 0;
-   }
-   return buf->len;
+static inline size_t buff_maxlen(const struct buff *buf) {
+  if (buf == NULL) {
+    return 0;
+  }
+  return buf->len;
 }
-
 
 /*
  *------------------------------------------------------------------------
@@ -101,15 +87,12 @@ buff_maxlen(const struct buff *buf)
  *------------------------------------------------------------------------
  */
 
-static inline size_t
-buff_curlen(const struct buff *buf)
-{
-   if (buf == NULL) {
-      return 0;
-   }
-   return buf->idx;
+static inline size_t buff_curlen(const struct buff *buf) {
+  if (buf == NULL) {
+    return 0;
+  }
+  return buf->idx;
 }
-
 
 /*
  *------------------------------------------------------------------------
@@ -119,14 +102,11 @@ buff_curlen(const struct buff *buf)
  *------------------------------------------------------------------------
  */
 
-static inline size_t
-buff_space_left(const struct buff *buf)
-{
-   ASSERT(buf->idx <= buf->len);
+static inline size_t buff_space_left(const struct buff *buf) {
+  ASSERT(buf->idx <= buf->len);
 
-   return buf->len - buf->idx;
+  return buf->len - buf->idx;
 }
-
 
 /*
  *------------------------------------------------------------------------
@@ -136,18 +116,14 @@ buff_space_left(const struct buff *buf)
  *------------------------------------------------------------------------
  */
 
-static inline int
-buff_skip(struct buff *buf,
-          size_t len)
-{
-   ASSERT(buf);
+static inline int buff_skip(struct buff *buf, size_t len) {
+  ASSERT(buf);
 
-   buff_resize(buf, buf->idx + len);
-   buf->idx += len;
+  buff_resize(buf, buf->idx + len);
+  buf->idx += len;
 
-   return 0;
+  return 0;
 }
-
 
 /*
  *------------------------------------------------------------------------
@@ -157,16 +133,12 @@ buff_skip(struct buff *buf,
  *------------------------------------------------------------------------
  */
 
-static inline void
-buff_set_idx(struct buff *buf,
-             size_t idx)
-{
-   ASSERT(buf);
-   ASSERT(idx <= buf->len);
+static inline void buff_set_idx(struct buff *buf, size_t idx) {
+  ASSERT(buf);
+  ASSERT(idx <= buf->len);
 
-   buf->idx = idx;
+  buf->idx = idx;
 }
-
 
 /*
  *------------------------------------------------------------------------
@@ -176,19 +148,14 @@ buff_set_idx(struct buff *buf,
  *------------------------------------------------------------------------
  */
 
-static inline void
-buff_init(struct buff *buf,
-          void *base,
-          size_t len)
-{
-   ASSERT(buf);
+static inline void buff_init(struct buff *buf, void *base, size_t len) {
+  ASSERT(buf);
 
-   buf->base = base;
-   buf->len  = len;
-   buf->idx  = 0;
-   buf->grow = 0;
+  buf->base = base;
+  buf->len = len;
+  buf->idx = 0;
+  buf->grow = 0;
 }
-
 
 /*
  *------------------------------------------------------------------------
@@ -198,19 +165,14 @@ buff_init(struct buff *buf,
  *------------------------------------------------------------------------
  */
 
-static inline int
-buff_copy_to(struct buff *dst,
-             const void *src,
-             size_t len)
-{
-   buff_resize(dst, dst->idx + len);
-   if (len > 0) {
-      memcpy(buff_curptr(dst), src, len);
-      dst->idx += len;
-   }
-   return 0;
+static inline int buff_copy_to(struct buff *dst, const void *src, size_t len) {
+  buff_resize(dst, dst->idx + len);
+  if (len > 0) {
+    memcpy(buff_curptr(dst), src, len);
+    dst->idx += len;
+  }
+  return 0;
 }
-
 
 /*
  *------------------------------------------------------------------------
@@ -220,17 +182,12 @@ buff_copy_to(struct buff *dst,
  *------------------------------------------------------------------------
  */
 
-static inline int
-buff_copy_from(struct buff *src,
-               void *dst,
-               size_t len)
-{
-   buff_resize(src, src->idx + len);
-   memcpy(dst, buff_curptr(src), len);
-   src->idx += len;
-   return 0;
+static inline int buff_copy_from(struct buff *src, void *dst, size_t len) {
+  buff_resize(src, src->idx + len);
+  memcpy(dst, buff_curptr(src), len);
+  src->idx += len;
+  return 0;
 }
-
 
 /*
  *------------------------------------------------------------------------
@@ -240,16 +197,12 @@ buff_copy_from(struct buff *src,
  *------------------------------------------------------------------------
  */
 
-static inline int
-buff_append(struct buff *dst,
-            const struct buff *src)
-{
-   if (src == NULL) {
-      return 0;
-   }
-   return buff_copy_to(dst, src->base, src->idx);
+static inline int buff_append(struct buff *dst, const struct buff *src) {
+  if (src == NULL) {
+    return 0;
+  }
+  return buff_copy_to(dst, src->base, src->idx);
 }
-
 
 /*
  *------------------------------------------------------------------------
@@ -259,16 +212,12 @@ buff_append(struct buff *dst,
  *------------------------------------------------------------------------
  */
 
-static inline int
-buff_append_str(struct buff *dst,
-                const char *src)
-{
-   if (src == NULL) {
-      return 0;
-   }
-   return buff_copy_to(dst, src, strlen(src));
+static inline int buff_append_str(struct buff *dst, const char *src) {
+  if (src == NULL) {
+    return 0;
+  }
+  return buff_copy_to(dst, src, strlen(src));
 }
-
 
 /*
  *------------------------------------------------------------------------
@@ -278,15 +227,11 @@ buff_append_str(struct buff *dst,
  *------------------------------------------------------------------------
  */
 
-static inline int
-buff_push_back(struct buff *dst,
-               uint8 i)
-{
-   buff_resize(dst, dst->idx + 1);
-   dst->base[dst->idx++] = i;
-   return 0;
+static inline int buff_push_back(struct buff *dst, uint8 i) {
+  buff_resize(dst, dst->idx + 1);
+  dst->base[dst->idx++] = i;
+  return 0;
 }
-
 
 /*
  *------------------------------------------------------------------------
@@ -296,17 +241,14 @@ buff_push_back(struct buff *dst,
  *------------------------------------------------------------------------
  */
 
-static inline void
-buff_free_base(struct buff *buf)
-{
-   ASSERT(buf);
+static inline void buff_free_base(struct buff *buf) {
+  ASSERT(buf);
 
-   free(buf->base);
-   buf->base = NULL;
-   buf->len = 0;
-   buf->idx = 0;
+  free(buf->base);
+  buf->base = NULL;
+  buf->len = 0;
+  buf->idx = 0;
 }
-
 
 /*
  *------------------------------------------------------------------------
@@ -316,17 +258,14 @@ buff_free_base(struct buff *buf)
  *------------------------------------------------------------------------
  */
 
-static inline void
-buff_free(struct buff *buf)
-{
-   if (buf == NULL) {
-      return;
-   }
+static inline void buff_free(struct buff *buf) {
+  if (buf == NULL) {
+    return;
+  }
 
-   buff_free_base(buf);
-   free(buf);
+  buff_free_base(buf);
+  free(buf);
 }
-
 
 /*
  *------------------------------------------------------------------------
@@ -336,18 +275,14 @@ buff_free(struct buff *buf)
  *------------------------------------------------------------------------
  */
 
-static inline void
-buff_alloc_base(struct buff *buf,
-                size_t len)
-{
-   ASSERT(buf);
-   ASSERT(buf->base == NULL);
+static inline void buff_alloc_base(struct buff *buf, size_t len) {
+  ASSERT(buf);
+  ASSERT(buf->base == NULL);
 
-   buf->base = safe_malloc(len);
-   buf->len = len;
-   buf->idx = 0;
+  buf->base = safe_malloc(len);
+  buf->len = len;
+  buf->idx = 0;
 }
-
 
 /*
  *------------------------------------------------------------------------
@@ -357,20 +292,17 @@ buff_alloc_base(struct buff *buf,
  *------------------------------------------------------------------------
  */
 
-static inline struct buff *
-buff_alloc(void)
-{
-   struct buff *buf;
+static inline struct buff *buff_alloc(void) {
+  struct buff *buf;
 
-   buf = safe_malloc(sizeof *buf);
-   buf->idx  = 0;
-   buf->len  = 64;
-   buf->grow = 1;
-   buf->base = safe_malloc(buf->len);
+  buf = safe_malloc(sizeof *buf);
+  buf->idx = 0;
+  buf->len = 64;
+  buf->grow = 1;
+  buf->base = safe_malloc(buf->len);
 
-   return buf;
+  return buf;
 }
-
 
 /*
  *------------------------------------------------------------------------
@@ -380,16 +312,13 @@ buff_alloc(void)
  *------------------------------------------------------------------------
  */
 
-static inline struct buff *
-buff_dup(const struct buff *buf)
-{
-   struct buff *buf2;
+static inline struct buff *buff_dup(const struct buff *buf) {
+  struct buff *buf2;
 
-   buf2 = buff_alloc();
-   buff_append(buf2, buf);
+  buf2 = buff_alloc();
+  buff_append(buf2, buf);
 
-   return buf2;
+  return buf2;
 }
-
 
 #endif /* __BUFF_H__ */

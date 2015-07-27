@@ -8,9 +8,7 @@
 
 #define LGPFX "RPCIMPL:"
 
-
 static struct hashtable *method_handler_ht;
-
 
 /*
  *-------------------------------------------------------------------------
@@ -22,16 +20,14 @@ static struct hashtable *method_handler_ht;
 
 static int sanity_check(struct method_invocation_data *mi_data,
                         json_t **error) {
-
-    if (btc->blockStore == NULL) {
-        Log(LGPFX" %s: blockstore is null\n", __FUNCTION__);
-        *error = json_object();
-        json_object_set_new(*error, "name", json_string("InvalidBlockstoreState"));
-        return 1;
-    }
-    return 0;
+  if (btc->blockStore == NULL) {
+    Log(LGPFX " %s: blockstore is null\n", __FUNCTION__);
+    *error = json_object();
+    json_object_set_new(*error, "name", json_string("InvalidBlockstoreState"));
+    return 1;
+  }
+  return 0;
 }
-
 
 /*
  *-------------------------------------------------------------------------
@@ -42,17 +38,15 @@ static int sanity_check(struct method_invocation_data *mi_data,
  */
 
 static void rpc_get_block_count(struct method_invocation_data *mi_data,
-                         json_t **result,
-                         json_t **error) {
-    if (sanity_check(mi_data, error)) {
-        return;
-    }
+                                json_t **result, json_t **error) {
+  if (sanity_check(mi_data, error)) {
+    return;
+  }
 
-    *result = json_object();
-    json_object_set_new(*result, "result",
-                        json_integer(blockstore_get_height(btc->blockStore)));
+  *result = json_object();
+  json_object_set_new(*result, "result",
+                      json_integer(blockstore_get_height(btc->blockStore)));
 }
-
 
 /*
  *-------------------------------------------------------------------------
@@ -63,17 +57,15 @@ static void rpc_get_block_count(struct method_invocation_data *mi_data,
  */
 
 method_fn get_rpc_method_fn(const char *name) {
-    method_fn fn;
+  method_fn fn;
 
-    ASSERT(method_handler_ht != NULL);
+  ASSERT(method_handler_ht != NULL);
 
-    if (!hashtable_lookup(method_handler_ht, name, strlen(name),
-                          (void **) &fn)) {
-        return NULL;
-    }
-    return fn;
+  if (!hashtable_lookup(method_handler_ht, name, strlen(name), (void **)&fn)) {
+    return NULL;
+  }
+  return fn;
 }
-
 
 /*
  *-------------------------------------------------------------------------
@@ -84,23 +76,22 @@ method_fn get_rpc_method_fn(const char *name) {
  */
 
 int rpc_methods_init(void) {
-    method_handler_ht = hashtable_create();
-    if (method_handler_ht == NULL) {
-        return 1;
-    }
+  method_handler_ht = hashtable_create();
+  if (method_handler_ht == NULL) {
+    return 1;
+  }
 
-    #define RPC_REGISTER(name, fn)  \
-        do {  \
-            hashtable_insert(method_handler_ht, #name, strlen(#name), fn);  \
-        } while (0);
+#define RPC_REGISTER(name, fn)                                     \
+  do {                                                             \
+    hashtable_insert(method_handler_ht, #name, strlen(#name), fn); \
+  } while (0);
 
-    RPC_REGISTER(getblockcount, rpc_get_block_count);
+  RPC_REGISTER(getblockcount, rpc_get_block_count);
 
-    #undef RPC_REGISTER
+#undef RPC_REGISTER
 
-    return 0;
+  return 0;
 }
-
 
 /*
  *-------------------------------------------------------------------------
@@ -110,5 +101,4 @@ int rpc_methods_init(void) {
  *-------------------------------------------------------------------------
  */
 
-void rpc_methods_exit(void) {
-}
+void rpc_methods_exit(void) {}

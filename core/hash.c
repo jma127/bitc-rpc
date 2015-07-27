@@ -10,7 +10,6 @@
 #include "hash.h"
 #include "util.h"
 
-
 /*
  *-------------------------------------------------------------------------
  *
@@ -19,31 +18,27 @@
  *-------------------------------------------------------------------------
  */
 
-bool
-uint256_from_str(const char *str,
-                 uint256    *hash)
-{
-   int i;
+bool uint256_from_str(const char *str, uint256 *hash) {
+  int i;
 
-   if (strlen(str) != 2 * DIGEST_SHA256_LEN) {
+  if (strlen(str) != 2 * DIGEST_SHA256_LEN) {
+    return 0;
+  }
+
+  for (i = 0; i < DIGEST_SHA256_LEN; i++) {
+    char str0[3] = {0};
+    uint32 v = 0;
+    int res;
+
+    memcpy(str0, str + 2 * i, 2);
+    res = sscanf(str0, "%02x", &v);
+    if (res != 1) {
       return 0;
-   }
-
-   for (i = 0; i < DIGEST_SHA256_LEN; i++) {
-      char str0[3] = { 0 };
-      uint32 v = 0;
-      int res;
-
-      memcpy(str0, str + 2 * i, 2);
-      res = sscanf(str0, "%02x", &v);
-      if (res != 1) {
-         return 0;
-      }
-      hash->data[DIGEST_SHA256_LEN - i - 1] = v;
-   }
-   return 1;
+    }
+    hash->data[DIGEST_SHA256_LEN - i - 1] = v;
+  }
+  return 1;
 }
-
 
 /*
  *---------------------------------------------------
@@ -53,18 +48,15 @@ uint256_from_str(const char *str,
  *---------------------------------------------------
  */
 
-static void
-uint256_reverse(uint256 *hash)
-{
-   int i;
+static void uint256_reverse(uint256 *hash) {
+  int i;
 
-   for (i = 0; i < ARRAYSIZE(hash->data) / 2; i++) {
-      uint8 v = hash->data[DIGEST_SHA256_LEN - i - 1];
-      hash->data[DIGEST_SHA256_LEN - i - 1] = hash->data[i];
-      hash->data[i] = v;
-   }
+  for (i = 0; i < ARRAYSIZE(hash->data) / 2; i++) {
+    uint8 v = hash->data[DIGEST_SHA256_LEN - i - 1];
+    hash->data[DIGEST_SHA256_LEN - i - 1] = hash->data[i];
+    hash->data[i] = v;
+  }
 }
-
 
 /*
  *---------------------------------------------------
@@ -74,19 +66,15 @@ uint256_reverse(uint256 *hash)
  *---------------------------------------------------
  */
 
-static void
-uint160_reverse(uint160 *hash)
-{
-   int i;
+static void uint160_reverse(uint160 *hash) {
+  int i;
 
-   for (i = 0; i < ARRAYSIZE(hash->data) / 2; i++) {
-      uint8 v = hash->data[DIGEST_RIPEMD160_LEN - i - 1];
-      hash->data[DIGEST_RIPEMD160_LEN - i - 1] = hash->data[i];
-      hash->data[i] = v;
-   }
+  for (i = 0; i < ARRAYSIZE(hash->data) / 2; i++) {
+    uint8 v = hash->data[DIGEST_RIPEMD160_LEN - i - 1];
+    hash->data[DIGEST_RIPEMD160_LEN - i - 1] = hash->data[i];
+    hash->data[i] = v;
+  }
 }
-
-
 
 /*
  *---------------------------------------------------
@@ -96,20 +84,14 @@ uint160_reverse(uint160 *hash)
  *---------------------------------------------------
  */
 
-void
-uint160_snprintf_reverse(char *str,
-                         size_t len,
-                         const uint160 *hash)
-{
-   uint160 h;
+void uint160_snprintf_reverse(char *str, size_t len, const uint160 *hash) {
+  uint160 h;
 
-   memcpy(&h, hash, sizeof h);
-   uint160_reverse(&h);
+  memcpy(&h, hash, sizeof h);
+  uint160_reverse(&h);
 
-   str_snprintf_bytes(str, len, NULL, h.data, ARRAYSIZE(h.data));
+  str_snprintf_bytes(str, len, NULL, h.data, ARRAYSIZE(h.data));
 }
-
-
 
 /*
  *---------------------------------------------------
@@ -119,21 +101,16 @@ uint160_snprintf_reverse(char *str,
  *---------------------------------------------------
  */
 
-void
-uint256_snprintf_reverse(char *str,
-                         size_t len,
-                         const uint256 *hash)
-{
-   uint256 h;
+void uint256_snprintf_reverse(char *str, size_t len, const uint256 *hash) {
+  uint256 h;
 
-   ASSERT(len >= 2 * sizeof(uint256) + 1);
+  ASSERT(len >= 2 * sizeof(uint256) + 1);
 
-   memcpy(&h, hash, sizeof h);
-   uint256_reverse(&h);
+  memcpy(&h, hash, sizeof h);
+  uint256_reverse(&h);
 
-   str_snprintf_bytes(str, len, NULL, h.data, ARRAYSIZE(h.data));
+  str_snprintf_bytes(str, len, NULL, h.data, ARRAYSIZE(h.data));
 }
-
 
 /*
  *---------------------------------------------------
@@ -143,19 +120,14 @@ uint256_snprintf_reverse(char *str,
  *---------------------------------------------------
  */
 
-void
-sha256_calc(const void *buf,
-            size_t      bufLen,
-            uint256    *digest)
-{
-   uint32 digestLen = sizeof *digest;
-   EVP_MD_CTX ctx;
+void sha256_calc(const void *buf, size_t bufLen, uint256 *digest) {
+  uint32 digestLen = sizeof *digest;
+  EVP_MD_CTX ctx;
 
-   EVP_DigestInit(&ctx, EVP_sha256());
-   EVP_DigestUpdate(&ctx, buf, bufLen);
-   EVP_DigestFinal(&ctx, digest->data, &digestLen);
+  EVP_DigestInit(&ctx, EVP_sha256());
+  EVP_DigestUpdate(&ctx, buf, bufLen);
+  EVP_DigestFinal(&ctx, digest->data, &digestLen);
 }
-
 
 /*
  *---------------------------------------------------
@@ -165,17 +137,12 @@ sha256_calc(const void *buf,
  *---------------------------------------------------
  */
 
-void
-hash160_calc(const void *buf,
-             size_t      bufLen,
-             uint160    *digest)
-{
-   uint256 h;
+void hash160_calc(const void *buf, size_t bufLen, uint160 *digest) {
+  uint256 h;
 
-   sha256_calc(buf, bufLen, &h);
-   RIPEMD160(&h.data[0], sizeof h, digest->data);
+  sha256_calc(buf, bufLen, &h);
+  RIPEMD160(&h.data[0], sizeof h, digest->data);
 }
-
 
 /*
  *---------------------------------------------------
@@ -185,17 +152,12 @@ hash160_calc(const void *buf,
  *---------------------------------------------------
  */
 
-void
-hash256_calc(const void *buf,
-             size_t len,
-             uint256 *hash)
-{
-   uint256 hash0;
+void hash256_calc(const void *buf, size_t len, uint256 *hash) {
+  uint256 hash0;
 
-   sha256_calc(buf, len, &hash0);
-   sha256_calc(&hash0, sizeof hash0, hash);
+  sha256_calc(buf, len, &hash0);
+  sha256_calc(&hash0, sizeof hash0, hash);
 }
-
 
 /*
  *---------------------------------------------------
@@ -205,14 +167,9 @@ hash256_calc(const void *buf,
  *---------------------------------------------------
  */
 
-void
-hash4_calc(const void *buf,
-           size_t len,
-           uint8 hash[4])
-{
-   uint256 hash0;
+void hash4_calc(const void *buf, size_t len, uint8 hash[4]) {
+  uint256 hash0;
 
-   hash256_calc(buf, len, &hash0);
-   memcpy(hash, &hash0.data, 4);
+  hash256_calc(buf, len, &hash0);
+  memcpy(hash, &hash0.data, 4);
 }
-

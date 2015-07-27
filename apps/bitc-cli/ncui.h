@@ -1,7 +1,7 @@
 #ifndef __NCUI_H__
 #define __NCUI_H__
 
-int  ncui_init(void);
+int ncui_init(void);
 void ncui_exit(void);
 
 void ncui_input_cb(void *clientData);

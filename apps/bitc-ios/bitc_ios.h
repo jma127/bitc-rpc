@@ -11,19 +11,12 @@
 
 #include <stdio.h>
 
-void
-LogViewAppend(const char *pfx,
-              const char *line);
+void LogViewAppend(const char *pfx, const char *line);
 
-void
-DashboardUpdate(int height,
-                const char *hash,
-                int connected,
-                int total, int numAddrs,
-                const char *date);
+void DashboardUpdate(int height, const char *hash, int connected, int total,
+                     int numAddrs, const char *date);
 
 void BlockListAddBlock(int height);
-
 
 void bitc_ios_log(const char *pfx, const char *line);
 void bitc_ios_info_update(void);

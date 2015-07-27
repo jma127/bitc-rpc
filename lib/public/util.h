@@ -11,7 +11,7 @@
 void Panic(const char *format, ...) PRINTF_GCC_DECL(1, 2) NORETURN;
 void Warning(const char *format, ...) PRINTF_GCC_DECL(1, 2);
 
-typedef void (LogCB)(const char *ts, const char *str, void *clientData);
+typedef void(LogCB)(const char *ts, const char *str, void *clientData);
 void Log_SetCB(LogCB *logCB, void *clientData);
 void Log(const char *format, ...) PRINTF_GCC_DECL(1, 2);
 void Log_SetLevel(int level);
@@ -26,14 +26,14 @@ char *print_time_local(uint32 t, const char *fmt);
 char *print_time_local_short(uint32 time);
 char *print_size(uint64 size);
 char *print_latency(mtime_t latency);
-void  print_backtrace(void);
+void print_backtrace(void);
 
-typedef void (OnPanicCB)(void *data);
-void panic_register_cb(OnPanicCB *callback, void  *clientData);
+typedef void(OnPanicCB)(void *data);
+void panic_register_cb(OnPanicCB *callback, void *clientData);
 
-bool  util_throttle(uint32 count);
-void  util_bumpnofds(void);
-void  util_bumpcoresize(void);
+bool util_throttle(uint32 count);
+void util_bumpnofds(void);
+void util_bumpcoresize(void);
 uint8 util_log2(uint32 val);
 char *util_gethomedir(void);
 char *util_getusername(void);
@@ -65,7 +65,7 @@ bool mutex_islocked(struct mutex *lock);
 
 struct condvar;
 
-struct condvar * condvar_alloc(void);
+struct condvar *condvar_alloc(void);
 void condvar_wait(struct condvar *cv, struct mutex *lock);
 void condvar_signal(struct condvar *cv);
 void condvar_free(struct condvar *cv);
@@ -75,59 +75,57 @@ void condvar_free(struct condvar *cv);
  */
 
 #define NOT_TESTED() \
-     Warning("NOT_TESTED -- %s:%s:%u\n", __FILE__, __FUNCTION__, __LINE__)
+  Warning("NOT_TESTED -- %s:%s:%u\n", __FILE__, __FUNCTION__, __LINE__)
 
-#define NOT_TESTED_ONCE()       \
-      do {                      \
-         static bool _done;     \
-         if (!_done) {          \
-            _done = 1;          \
-            NOT_TESTED();       \
-         }                      \
-      } while (0)
+#define NOT_TESTED_ONCE() \
+  do {                    \
+    static bool _done;    \
+    if (!_done) {         \
+      _done = 1;          \
+      NOT_TESTED();       \
+    }                     \
+  } while (0)
 
-#define DOLOG(_lvl)  (verbose >= _lvl)
+#define DOLOG(_lvl) (verbose >= _lvl)
 
-#define LOG(_lvl, _fmt)                      \
-   do {                                      \
-      if (DOLOG(_lvl)) {                     \
-         Log _fmt;                           \
-      }                                      \
-   } while (0)
+#define LOG(_lvl, _fmt) \
+  do {                  \
+    if (DOLOG(_lvl)) {  \
+      Log _fmt;         \
+    }                   \
+  } while (0)
 
-#define NOT_IMPLEMENTED()                       \
-   do {                                         \
-      Panic("NOT_IMPLEMENTED: %s:%s:%u\n",      \
-            __FILE__, __func__, __LINE__);      \
-   } while (0)
+#define NOT_IMPLEMENTED()                                               \
+  do {                                                                  \
+    Panic("NOT_IMPLEMENTED: %s:%s:%u\n", __FILE__, __func__, __LINE__); \
+  } while (0)
 
-#define NOT_REACHED()                           \
-   do {                                         \
-      Panic("NOT_REACHED: %s:%s:%u\n",          \
-            __FILE__, __func__, __LINE__);      \
-   } while (0)
+#define NOT_REACHED()                                               \
+  do {                                                              \
+    Panic("NOT_REACHED: %s:%s:%u\n", __FILE__, __func__, __LINE__); \
+  } while (0)
 
-#define ASSERT_MEMALLOC(_x)                               \
-   do {                                                   \
-      if (unlikely((_x) == NULL)) {                       \
-         Panic("Failed to allocate memory at %s:%s:%u\n", \
-               __FILE__, __func__, __LINE__);             \
-      }                                                   \
-   } while (0)
+#define ASSERT_MEMALLOC(_x)                                                \
+  do {                                                                     \
+    if (unlikely((_x) == NULL)) {                                          \
+      Panic("Failed to allocate memory at %s:%s:%u\n", __FILE__, __func__, \
+            __LINE__);                                                     \
+    }                                                                      \
+  } while (0)
 
-#define ASSERT_NOT_TESTED(_x)                           \
-   if (unlikely(!(_x))) {                               \
-      Warning("ASSERT_NOT_TESTED failed at %s:%s:%u\n"  \
-              "--- Expression '%s' is false.\n",        \
-              __FILE__, __func__, __LINE__,             \
-              STR(_x));                                 \
-   }
-#define ASSERT(_x)                                      \
-   if (unlikely(!(_x))) {                               \
-      Panic("ASSERT failed at %s:%s:%u\n"               \
-            "PANIC: Expression '%s' not TRUE.\n",       \
-            __FILE__, __func__, __LINE__,               \
-            STR(_x));                                   \
-   }
+#define ASSERT_NOT_TESTED(_x)                    \
+  if (unlikely(!(_x))) {                         \
+    Warning(                                     \
+        "ASSERT_NOT_TESTED failed at %s:%s:%u\n" \
+        "--- Expression '%s' is false.\n",       \
+        __FILE__, __func__, __LINE__, STR(_x));  \
+  }
+#define ASSERT(_x)                              \
+  if (unlikely(!(_x))) {                        \
+    Panic(                                      \
+        "ASSERT failed at %s:%s:%u\n"           \
+        "PANIC: Expression '%s' not TRUE.\n",   \
+        __FILE__, __func__, __LINE__, STR(_x)); \
+  }
 
 #endif /* __UTIL_H__ */

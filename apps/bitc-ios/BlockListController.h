@@ -10,6 +10,6 @@
 
 @interface BlockListController : UITableViewController
 
-@property (strong, nonatomic) IBOutlet UITableView *BlockList;
+@property(strong, nonatomic) IBOutlet UITableView *BlockList;
 
 @end

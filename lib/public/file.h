@@ -12,9 +12,7 @@
 #include <limits.h>
 #endif
 
-
 struct file_descriptor;
-
 
 bool file_valid(const struct file_descriptor *fd);
 
@@ -25,17 +23,14 @@ int64 file_getsize(const struct file_descriptor *desc);
 int file_truncate(const struct file_descriptor *desc, uint64 offset);
 bool file_exists(const char *name);
 int file_close(struct file_descriptor *desc);
-int file_pread(const struct file_descriptor *desc,
-               uint64 offset, void *buf, size_t len, size_t *num);
-int file_pwrite(const struct file_descriptor *desc,
-                uint64 offset, const void *buf, size_t len, size_t *num);
-int file_open(const char *name,
-              bool readOnly,
-              bool unbuf,
+int file_pread(const struct file_descriptor *desc, uint64 offset, void *buf,
+               size_t len, size_t *num);
+int file_pwrite(const struct file_descriptor *desc, uint64 offset,
+                const void *buf, size_t len, size_t *num);
+int file_open(const char *name, bool readOnly, bool unbuf,
               struct file_descriptor **desc);
 void file_freedirlist(char **names);
-int file_listdirectory(const char *directory,
-                       char ***namesOut);
+int file_listdirectory(const char *directory, char ***namesOut);
 char *file_getcwd(void);
 char *file_fullpath(const char *path);
 char *file_getname(const char *path);

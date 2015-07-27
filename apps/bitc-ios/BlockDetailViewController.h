@@ -10,13 +10,13 @@
 
 @interface BlockDetailViewController : UITableViewController
 
-@property (weak, nonatomic) IBOutlet UILabel *nonceLabel;
-@property (weak, nonatomic) IBOutlet UILabel *bitsLabel;
-@property (weak, nonatomic) IBOutlet UILabel *blockVersionLabel;
-@property (weak, nonatomic) IBOutlet UILabel *timestampLabel;
+@property(weak, nonatomic) IBOutlet UILabel *nonceLabel;
+@property(weak, nonatomic) IBOutlet UILabel *bitsLabel;
+@property(weak, nonatomic) IBOutlet UILabel *blockVersionLabel;
+@property(weak, nonatomic) IBOutlet UILabel *timestampLabel;
 
-@property (strong, nonatomic) NSNumber         *blockNumber;
-@property (strong, nonatomic) IBOutlet UILabel *blockNumberLabel;
-@property (strong, nonatomic) NSString         *hashStr;
+@property(strong, nonatomic) NSNumber *blockNumber;
+@property(strong, nonatomic) IBOutlet UILabel *blockNumberLabel;
+@property(strong, nonatomic) NSString *hashStr;
 
 @end
